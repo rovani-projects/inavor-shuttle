@@ -1,8 +1,8 @@
 # Inavor Shuttle - Shopify Product Import Application
 
-**Company**: Rovani Projects, Inc.
-**Repository**: https://github.com/rovaniprojects/inavor-shuttle
-**Purpose**: Learning project & proof of concept for Shopify App Store publication
+**Company**: [Rovani Projects, Inc.](https://rovaniprojects.com)  
+**Repository**: https://github.com/rovaniprojects/inavor-shuttle  
+**Purpose**: Learning project & proof of concept for Shopify App Store publication  
 **Primary Goal**: AWS platform mastery through production-grade Shopify app development
 
 ## Project Overview
