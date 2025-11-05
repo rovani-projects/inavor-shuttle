@@ -19,7 +19,7 @@ export class InavoreShuttleStack extends cdk.Stack {
     super(scope, id, props);
 
     // Stack description for CloudFormation
-    const description = new cdk.CfnOutput(this, 'StackDescription', {
+    new cdk.CfnOutput(this, 'StackDescription', {
       value: 'Inavor Shuttle - Shopify Product Import Application',
       exportName: `${id}-description`,
     });
