@@ -1,0 +1,31 @@
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+*.js
+!jest.config.js
+*.d.ts
+node_modules/
+dist/
+build/
+
+# CDK asset staging directory
+.cdk.staging/
+cdk.out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+coverage/
+*.lcov
+
+# AWS temporary files
+*.log
