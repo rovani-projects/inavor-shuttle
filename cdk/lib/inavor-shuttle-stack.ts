@@ -30,9 +30,8 @@ export class InavoreShuttleStack extends cdk.Stack {
     });
 
     // Output the environment
-    const environment = this.node.root.node.tryGetContext('environment') || 'dev';
     new cdk.CfnOutput(this, 'Environment', {
-      value: environment,
+      value: this.node.root.node.tryGetContext('environment') || 'dev',
       exportName: `${id}-environment`,
     });
 
