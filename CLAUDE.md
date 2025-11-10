@@ -37,7 +37,8 @@ docs/
 ├── phase-1-issues-summary.md               # 334 lines - quick reference for Phase 1 (40 issues)
 ├── phase-2-3-issues-template.md            # 1,000+ lines - templates for Phases 2 & 3 (~45 issues)
 ├── ISSUES-INDEX.md                         # 417 lines - master index and navigation
-└── COMPLETION-SUMMARY.md                   # 405 lines - status and execution guide
+└── worklogs/                               # Daily work logs - see Worklog System below
+    └── YYYY-MM-DD-description.md           # Daily accomplishments and progress
 ```
 
 ### Existing Prisma Models
@@ -446,6 +447,38 @@ npm run build          # Build for production
 - **Branches**: `main` (production), `develop` (integration), `feature/*` (features)
 - **Commits**: Use Conventional Commits (`feat:`, `fix:`, `docs:`, etc.)
 - **PRs**: Require passing tests + type checks + linked GitHub issue
+
+### Worklog System
+
+Daily work is tracked in `/docs/worklogs/` with one file per day. Each worklog captures accomplishments, code changes, issues addressed, and technical decisions made.
+
+**File naming**: `YYYY-MM-DD-descriptive-title.md`
+**Example**: `2025-11-05-project-initialization.md`
+
+**End of day ritual**:
+```bash
+/closetoday
+```
+
+This slash command will:
+1. Review all commits made today (since 00:00:00)
+2. Check for any uncommitted changes
+3. Create or update the worklog file for today
+4. Commit the worklog with message: `docs: Update worklog for YYYY-MM-DD`
+
+**When to update worklogs**:
+- Use `/closetoday` at the end of each workday
+- Worklogs are the source of truth for daily progress
+- They become historical records for blog posts and retrospectives
+- They help with context-switching and onboarding new team members
+
+**What to include in each worklog**:
+- Summary of what was accomplished
+- Key code changes and new files
+- GitHub issues addressed (#123, #124)
+- Technical decisions made
+- Blockers or challenges encountered
+- Next steps for tomorrow
 
 ---
 
