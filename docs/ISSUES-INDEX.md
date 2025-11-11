@@ -34,35 +34,35 @@ Complete index and guide for all GitHub issues across all project phases.
 
 ## Documentation Files
 
+This project maintains a minimal, focused documentation set. All specifications are active references used during development.
+
 ### Core Implementation Planning
 - **`/docs/comprehensive-implementation-plan.md`** (2,360 lines)
-  - Complete project specification
-  - Architecture design
-  - Database schema
-  - Technology stack
-  - Deployment strategy
-  - Security & compliance
-  - Risk management
+  - **Purpose**: Complete technical specification and architecture reference
+  - **Use When**: Making architectural decisions, understanding design rationale, reviewing security/deployment strategy
+  - **Audience**: Developers, architects, team leads
+  - **Key Sections**:
+    - Technology stack & AWS services
+    - Architecture design with diagrams
+    - Database schema (DynamoDB single-table)
+    - Testing, deployment, and monitoring strategies
+    - Security & compliance requirements
+    - Risk management & contingency plans
 
-### Issue Management
-- **`/docs/github-issues-breakdown.md`** (Master breakdown)
-  - Detailed issue specifications
-  - Dependencies graph
-  - Priority ordering
-  - Batch creation guide
-  - All 85+ issue templates
+### Future Phase Templates
+- **`/docs/phase-2-3-issues-template.md`** (1,000+ lines)
+  - **Purpose**: Issue templates for Phase 2 and Phase 3 development
+  - **Use When**: Creating GitHub issues after Phase 1 completion
+  - **When to Create Issues**: After all Phase 1 issues (#2-#41) are closed
+  - **Contains**:
+    - Phase 2 (~25 issues): Advanced features, billing integration, launch prep
+    - Phase 3 (~20 issues): Enterprise features, scaling, optimization
 
-- **`/docs/phase-1-issues-summary.md`** (Quick reference)
-  - All 40 Phase 1 issues with GitHub links
-  - Timeline and dependencies
-  - Success criteria
-  - Development workflow
-  - Labels reference
-
-- **`/docs/phase-2-3-issues-template.md`** (Future phases)
-  - Phase 2 templates (~25 issues)
-  - Phase 3 templates (~20 issues)
-  - Usage instructions
+### Navigation & Status Tracking
+- **`/docs/ISSUES-INDEX.md`** (this file)
+  - **Purpose**: Master index, project navigation, and status tracking
+  - **Use When**: Understanding project structure, finding information, tracking progress
+  - **Updated**: After each phase milestone
 
 ---
 
@@ -387,11 +387,27 @@ Week 11: #34-41 (Billing, Analytics, Testing, Deployment)
 
 | Document | Purpose | When to Use |
 |----------|---------|------------|
-| comprehensive-implementation-plan.md | Full project spec | Architecture decisions, understanding why |
-| github-issues-breakdown.md | Detailed issue specs | Writing PRs, understanding full scope |
-| phase-1-issues-summary.md | Quick Phase 1 ref | Daily work, seeing issue URLs |
-| phase-2-3-issues-template.md | Future phases | Creating Phase 2/3 issues |
-| ISSUES-INDEX.md | This file | Navigation, status, workflow |
+| comprehensive-implementation-plan.md | Full technical specification | Architecture decisions, design rationale, security/deployment review |
+| phase-2-3-issues-template.md | Issue templates for future phases | Creating Phase 2/3 GitHub issues after Phase 1 completion |
+| ISSUES-INDEX.md | Master index & navigation | Project structure, progress tracking, team coordination |
+
+---
+
+## Documentation Structure
+
+This project maintains a lean documentation set focused on active specifications:
+
+```
+docs/
+├── comprehensive-implementation-plan.md
+│   └─ 2,360 lines | Complete technical specification & architecture reference
+├── phase-2-3-issues-template.md
+│   └─ 1,000+ lines | Templates for Phase 2 & 3 GitHub issues
+└── ISSUES-INDEX.md
+    └─ 414 lines | Master index, navigation, status tracking (this file)
+```
+
+**Philosophy**: Keep only documents that are actively used during development. Delegate GitHub-specific information (Phase 1 summary, detailed issue specs, restart guides) to GitHub issues themselves.
 
 ---
 
@@ -411,6 +427,6 @@ Week 11: #34-41 (Billing, Analytics, Testing, Deployment)
 
 ---
 
-**Last Updated**: 2025-01-15
-**Document Version**: 1.0
-**Status**: Phase 1 Complete, Phases 2-3 Ready for Template Expansion
+**Last Updated**: 2025-11-10
+**Document Version**: 1.1
+**Status**: Phase 1 Issues Created, Documentation Cleaned Up
