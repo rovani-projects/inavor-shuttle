@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
 /**
@@ -20,6 +21,11 @@ export class InavoreShuttleStack extends cdk.Stack {
   public readonly lambdaExecutionRole: iam.Role;
   public readonly appRunnerRole: iam.Role;
 
+  // DynamoDB tables
+  public readonly shopsTable: dynamodb.Table;
+  public readonly jobsTable: dynamodb.Table;
+  public readonly importHistoryTable: dynamodb.Table;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -33,6 +39,141 @@ export class InavoreShuttleStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'Environment', {
       value: this.node.root.node.tryGetContext('environment') || 'dev',
       exportName: `${id}-environment`,
+    });
+
+    // ===== DYNAMODB TABLES =====
+
+    /**
+     * Shops Table
+     * Stores merchant/shop information for multi-tenant architecture
+     *
+     * Partition Key: domain (shop domain, e.g., "mystore.myshopify.com")
+     *
+     * Attributes:
+     * - domain: Shop domain (primary key)
+     * - name: Shop name
+     * - accessToken: Shopify API access token (should be encrypted in production)
+     * - plan: Billing plan (FREE, SMALL, MEDIUM, LARGE)
+     * - installedAt: Timestamp when app was installed
+     * - uninstalledAt: Timestamp when app was uninstalled (null if active)
+     * - billingStatus: Current billing status (ACTIVE, SUSPENDED, CANCELLED)
+     * - settings: JSON object with shop-specific settings
+     */
+    this.shopsTable = new dynamodb.Table(this, 'ShopsTable', {
+      tableName: `${id}-shops`,
+      partitionKey: {
+        name: 'domain',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand billing
+      pointInTimeRecovery: true, // Enable PITR for data protection
+      removalPolicy: cdk.RemovalPolicy.RETAIN, // Retain table on stack deletion
+      encryption: dynamodb.TableEncryption.AWS_MANAGED, // Encrypt at rest
+    });
+
+    /**
+     * Jobs Table
+     * Tracks import/export jobs and their status
+     *
+     * Partition Key: jobId (ULID format for time-based sorting)
+     *
+     * GSI-1: shopDomain (PK) + createdAt (SK) - for listing jobs by shop
+     * GSI-2: status (PK) + createdAt (SK) - for querying jobs by status
+     *
+     * Attributes:
+     * - jobId: Unique job identifier (ULID)
+     * - shopDomain: Shop domain (for multi-tenant isolation)
+     * - type: Job type (IMPORT, EXPORT)
+     * - mode: Import mode (OVERWRITE_EXISTING, NEW_ONLY, NEW_AND_DRAFT, WIPE_AND_RESTORE)
+     * - status: Job status (QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED)
+     * - isDryRun: Boolean flag for dry run mode
+     * - totalProducts: Total number of products to process
+     * - processedProducts: Number of products processed so far
+     * - successfulProducts: Number of successfully processed products
+     * - failedProducts: Number of failed products
+     * - progressPercentage: Progress percentage (0-100)
+     * - startedAt: Job start timestamp
+     * - completedAt: Job completion timestamp
+     * - estimatedCompletionAt: Estimated completion time
+     * - s3Key: S3 path to import file
+     * - errorSummary: JSON object with error counts by type
+     * - shopifyApiCallsUsed: Number of Shopify API calls made
+     * - createdBy: User who created the job
+     * - createdAt: Job creation timestamp
+     * - expiresAt: TTL attribute (createdAt + 90 days)
+     */
+    this.jobsTable = new dynamodb.Table(this, 'JobsTable', {
+      tableName: `${id}-jobs`,
+      partitionKey: {
+        name: 'jobId',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
+      timeToLiveAttribute: 'expiresAt', // Auto-delete old jobs after 90 days
+    });
+
+    // GSI for querying jobs by shop domain
+    this.jobsTable.addGlobalSecondaryIndex({
+      indexName: 'shopDomain-createdAt-index',
+      partitionKey: {
+        name: 'shopDomain',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'createdAt',
+        type: dynamodb.AttributeType.NUMBER,
+      },
+      projectionType: dynamodb.ProjectionType.ALL, // Include all attributes
+    });
+
+    // GSI for querying jobs by status
+    this.jobsTable.addGlobalSecondaryIndex({
+      indexName: 'status-createdAt-index',
+      partitionKey: {
+        name: 'status',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'createdAt',
+        type: dynamodb.AttributeType.NUMBER,
+      },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+
+    /**
+     * Import History Table
+     * Stores historical records of all imports for analytics and auditing
+     *
+     * Partition Key: shopDomain
+     * Sort Key: timestamp (Unix timestamp in milliseconds)
+     *
+     * Attributes:
+     * - shopDomain: Shop domain (partition key)
+     * - timestamp: Import timestamp (sort key, Unix milliseconds)
+     * - jobId: Reference to job ID
+     * - productsImported: Number of products imported
+     * - status: Final job status (COMPLETED, FAILED)
+     * - errorCount: Number of errors encountered
+     * - expiresAt: TTL attribute (timestamp + 365 days)
+     */
+    this.importHistoryTable = new dynamodb.Table(this, 'ImportHistoryTable', {
+      tableName: `${id}-import-history`,
+      partitionKey: {
+        name: 'shopDomain',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'timestamp',
+        type: dynamodb.AttributeType.NUMBER,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
+      timeToLiveAttribute: 'expiresAt', // Auto-delete history after 365 days
     });
 
     // ===== IAM ROLES & POLICIES =====
@@ -57,7 +198,7 @@ export class InavoreShuttleStack extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
     );
 
-    // Inline policy for DynamoDB access (will be expanded in PHASE-1-INFRA-002)
+    // Inline policy for DynamoDB access
     this.lambdaExecutionRole.addToPrincipalPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
@@ -70,7 +211,12 @@ export class InavoreShuttleStack extends cdk.Stack {
           'dynamodb:BatchGetItem',
           'dynamodb:BatchWriteItem',
         ],
-        resources: ['arn:aws:dynamodb:*:*:table/inavor-shuttle-*'],
+        resources: [
+          this.shopsTable.tableArn,
+          this.jobsTable.tableArn,
+          `${this.jobsTable.tableArn}/index/*`, // Access to GSIs
+          this.importHistoryTable.tableArn,
+        ],
         sid: 'DynamoDBAccess',
       })
     );
@@ -157,7 +303,12 @@ export class InavoreShuttleStack extends cdk.Stack {
           'dynamodb:BatchGetItem',
           'dynamodb:BatchWriteItem',
         ],
-        resources: ['arn:aws:dynamodb:*:*:table/inavor-shuttle-*'],
+        resources: [
+          this.shopsTable.tableArn,
+          this.jobsTable.tableArn,
+          `${this.jobsTable.tableArn}/index/*`, // Access to GSIs
+          this.importHistoryTable.tableArn,
+        ],
         sid: 'DynamoDBAccess',
       })
     );
@@ -211,8 +362,44 @@ export class InavoreShuttleStack extends cdk.Stack {
       exportName: `${id}-apprunner-execution-role-arn`,
     });
 
+    // DynamoDB table outputs
+    new cdk.CfnOutput(this, 'ShopsTableName', {
+      value: this.shopsTable.tableName,
+      description: 'Name of Shops DynamoDB table',
+      exportName: `${id}-shops-table-name`,
+    });
+
+    new cdk.CfnOutput(this, 'ShopsTableArn', {
+      value: this.shopsTable.tableArn,
+      description: 'ARN of Shops DynamoDB table',
+      exportName: `${id}-shops-table-arn`,
+    });
+
+    new cdk.CfnOutput(this, 'JobsTableName', {
+      value: this.jobsTable.tableName,
+      description: 'Name of Jobs DynamoDB table',
+      exportName: `${id}-jobs-table-name`,
+    });
+
+    new cdk.CfnOutput(this, 'JobsTableArn', {
+      value: this.jobsTable.tableArn,
+      description: 'ARN of Jobs DynamoDB table',
+      exportName: `${id}-jobs-table-arn`,
+    });
+
+    new cdk.CfnOutput(this, 'ImportHistoryTableName', {
+      value: this.importHistoryTable.tableName,
+      description: 'Name of Import History DynamoDB table',
+      exportName: `${id}-import-history-table-name`,
+    });
+
+    new cdk.CfnOutput(this, 'ImportHistoryTableArn', {
+      value: this.importHistoryTable.tableArn,
+      description: 'ARN of Import History DynamoDB table',
+      exportName: `${id}-import-history-table-arn`,
+    });
+
     // Future resources will be added here:
-    // - DynamoDB tables (Session, Shop, Job, Usage tracking) - PHASE-1-INFRA-002
     // - S3 bucket with lifecycle policies - PHASE-1-INFRA-003
     // - SQS FIFO queue with DLQ - PHASE-1-INFRA-004
   }
