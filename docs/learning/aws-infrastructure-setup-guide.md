@@ -1,8 +1,8 @@
 # AWS Infrastructure Setup Guide
 
-**Project**: Inavor Shuttle
-**Purpose**: Manual steps to configure a production-ready AWS environment for Phase 1 infrastructure
-**Created**: 2025-11-10
+**Project**: Inavor Shuttle  
+**Purpose**: Manual steps to configure a production-ready AWS environment for Phase 1 infrastructure  
+**Created**: 2025-11-10  
 **Status**: Phase 1 - DynamoDB Tables (Issue #3)
 
 ---
