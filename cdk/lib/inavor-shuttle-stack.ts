@@ -66,7 +66,9 @@ export class InavorShuttleStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand billing
-      pointInTimeRecovery: true, // Enable PITR for data protection
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true, // Enable PITR for data protection
+      },
       removalPolicy: cdk.RemovalPolicy.RETAIN, // Retain table on stack deletion
       encryption: dynamodb.TableEncryption.AWS_MANAGED, // Encrypt at rest
     });
@@ -109,7 +111,9 @@ export class InavorShuttleStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: true,
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+      },
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
       timeToLiveAttribute: "expiresAt", // Auto-delete old jobs after 90 days
@@ -170,7 +174,9 @@ export class InavorShuttleStack extends cdk.Stack {
         type: dynamodb.AttributeType.NUMBER,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: true,
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+      },
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
       timeToLiveAttribute: "expiresAt", // Auto-delete history after 365 days

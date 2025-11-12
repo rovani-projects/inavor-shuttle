@@ -36,10 +36,11 @@ cp .env.example .env
 ```
 
 Edit `.env`:
+
 ```env
 ENVIRONMENT=dev
 AWS_ACCOUNT_ID=your-account-id
-AWS_REGION=us-east-1
+AWS_REGION=us-east-2
 ```
 
 ### 3. Build the CDK Project
@@ -107,6 +108,7 @@ This CDK setup is the foundation for Phase 1 (MVP) of the Inavor Shuttle project
 ## Development Workflow
 
 1. Create a new branch for your infrastructure feature:
+
    ```bash
    git checkout -b feature/PHASE-1-INFRA-002-dynamodb
    ```
@@ -114,6 +116,7 @@ This CDK setup is the foundation for Phase 1 (MVP) of the Inavor Shuttle project
 2. Make changes to the CDK stack in `lib/inavor-shuttle-stack.ts` or create new construct files
 
 3. Test locally (when applicable):
+
    ```bash
    npm run test
    npm run build
@@ -121,6 +124,7 @@ This CDK setup is the foundation for Phase 1 (MVP) of the Inavor Shuttle project
    ```
 
 4. Deploy to dev/staging (when ready):
+
    ```bash
    ENVIRONMENT=dev npx cdk deploy
    ```
@@ -159,6 +163,7 @@ ENVIRONMENT=prod npx cdk deploy
 ## Support
 
 For questions or issues:
+
 - Check the [Comprehensive Implementation Plan](../docs/comprehensive-implementation-plan.md)
 - Review the [GitHub Issues](https://github.com/rovani-projects/inavor-shuttle/issues)
 - See the [CLAUDE.md](../CLAUDE.md) for project guidelines

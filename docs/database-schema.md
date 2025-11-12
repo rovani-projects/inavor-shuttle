@@ -417,11 +417,11 @@ cdk deploy InavorShuttle-dev
 
 # Outputs:
 # InavorShuttle-dev.ShopsTableName = InavorShuttle-dev-shops
-# InavorShuttle-dev.ShopsTableArn = arn:aws:dynamodb:us-east-1:123456789:table/InavorShuttle-dev-shops
+# InavorShuttle-dev.ShopsTableArn = arn:aws:dynamodb:us-east-2:123456789:table/InavorShuttle-dev-shops
 # InavorShuttle-dev.JobsTableName = InavorShuttle-dev-jobs
-# InavorShuttle-dev.JobsTableArn = arn:aws:dynamodb:us-east-1:123456789:table/InavorShuttle-dev-jobs
+# InavorShuttle-dev.JobsTableArn = arn:aws:dynamodb:us-east-2:123456789:table/InavorShuttle-dev-jobs
 # InavorShuttle-dev.ImportHistoryTableName = InavorShuttle-dev-import-history
-# InavorShuttle-dev.ImportHistoryTableArn = arn:aws:dynamodb:us-east-1:123456789:table/InavorShuttle-dev-import-history
+# InavorShuttle-dev.ImportHistoryTableArn = arn:aws:dynamodb:us-east-2:123456789:table/InavorShuttle-dev-import-history
 ```
 
 ---

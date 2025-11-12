@@ -1473,7 +1473,7 @@ const app = new cdk.App();
 
 const env = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: "us-east-1", // or preferred region
+  region: "us-east-2", // or preferred region
 };
 
 // Stacks
@@ -1528,7 +1528,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_TEST }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_TEST }}
-          aws-region: us-east-1
+          aws-region: us-east-2
       - run: pnpm install
       - run: cd infrastructure && pnpm run cdk deploy --all --require-approval never
 
@@ -1562,7 +1562,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
-          aws-region: us-east-1
+          aws-region: us-east-2
       - run: pnpm install
       - run: cd infrastructure && pnpm run cdk deploy --all --require-approval never
 
