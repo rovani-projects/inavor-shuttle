@@ -1,10 +1,10 @@
-import * as cdk from 'aws-cdk-lib/core';
-import * as iam from 'aws-cdk-lib/aws-iam';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Construct } from 'constructs';
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as cdk from "aws-cdk-lib/core";
+import { Construct } from "constructs";
 
 /**
- * InavoreShuttleStack - Main CDK Stack for Inavor Shuttle
+ * InavorShuttleStack - Main CDK Stack for Inavor Shuttle
  *
  * This stack serves as the foundation for the Inavor Shuttle application.
  * It will be expanded with DynamoDB, S3, SQS, Lambda, and other AWS services.
@@ -16,7 +16,7 @@ import { Construct } from 'constructs';
  * - Lambda functions for async job processing
  * - IAM roles and policies for service integration
  */
-export class InavoreShuttleStack extends cdk.Stack {
+export class InavorShuttleStack extends cdk.Stack {
   // Public properties for use in other stacks
   public readonly lambdaExecutionRole: iam.Role;
   public readonly appRunnerRole: iam.Role;
@@ -30,14 +30,14 @@ export class InavoreShuttleStack extends cdk.Stack {
     super(scope, id, props);
 
     // Stack description for CloudFormation
-    new cdk.CfnOutput(this, 'StackDescription', {
-      value: 'Inavor Shuttle - Shopify Product Import Application',
+    new cdk.CfnOutput(this, "StackDescription", {
+      value: "Inavor Shuttle - Shopify Product Import Application",
       exportName: `${id}-description`,
     });
 
     // Output the environment
-    new cdk.CfnOutput(this, 'Environment', {
-      value: this.node.root.node.tryGetContext('environment') || 'dev',
+    new cdk.CfnOutput(this, "Environment", {
+      value: this.node.root.node.tryGetContext("environment") || "dev",
       exportName: `${id}-environment`,
     });
 
@@ -59,10 +59,10 @@ export class InavoreShuttleStack extends cdk.Stack {
      * - billingStatus: Current billing status (ACTIVE, SUSPENDED, CANCELLED)
      * - settings: JSON object with shop-specific settings
      */
-    this.shopsTable = new dynamodb.Table(this, 'ShopsTable', {
+    this.shopsTable = new dynamodb.Table(this, "ShopsTable", {
       tableName: `${id}-shops`,
       partitionKey: {
-        name: 'domain',
+        name: "domain",
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand billing
@@ -102,28 +102,28 @@ export class InavoreShuttleStack extends cdk.Stack {
      * - createdAt: Job creation timestamp
      * - expiresAt: TTL attribute (createdAt + 90 days)
      */
-    this.jobsTable = new dynamodb.Table(this, 'JobsTable', {
+    this.jobsTable = new dynamodb.Table(this, "JobsTable", {
       tableName: `${id}-jobs`,
       partitionKey: {
-        name: 'jobId',
+        name: "jobId",
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       pointInTimeRecovery: true,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
-      timeToLiveAttribute: 'expiresAt', // Auto-delete old jobs after 90 days
+      timeToLiveAttribute: "expiresAt", // Auto-delete old jobs after 90 days
     });
 
     // GSI for querying jobs by shop domain
     this.jobsTable.addGlobalSecondaryIndex({
-      indexName: 'shopDomain-createdAt-index',
+      indexName: "shopDomain-createdAt-index",
       partitionKey: {
-        name: 'shopDomain',
+        name: "shopDomain",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'createdAt',
+        name: "createdAt",
         type: dynamodb.AttributeType.NUMBER,
       },
       projectionType: dynamodb.ProjectionType.ALL, // Include all attributes
@@ -131,13 +131,13 @@ export class InavoreShuttleStack extends cdk.Stack {
 
     // GSI for querying jobs by status
     this.jobsTable.addGlobalSecondaryIndex({
-      indexName: 'status-createdAt-index',
+      indexName: "status-createdAt-index",
       partitionKey: {
-        name: 'status',
+        name: "status",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'createdAt',
+        name: "createdAt",
         type: dynamodb.AttributeType.NUMBER,
       },
       projectionType: dynamodb.ProjectionType.ALL,
@@ -159,21 +159,21 @@ export class InavoreShuttleStack extends cdk.Stack {
      * - errorCount: Number of errors encountered
      * - expiresAt: TTL attribute (timestamp + 365 days)
      */
-    this.importHistoryTable = new dynamodb.Table(this, 'ImportHistoryTable', {
+    this.importHistoryTable = new dynamodb.Table(this, "ImportHistoryTable", {
       tableName: `${id}-import-history`,
       partitionKey: {
-        name: 'shopDomain',
+        name: "shopDomain",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'timestamp',
+        name: "timestamp",
         type: dynamodb.AttributeType.NUMBER,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       pointInTimeRecovery: true,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
-      timeToLiveAttribute: 'expiresAt', // Auto-delete history after 365 days
+      timeToLiveAttribute: "expiresAt", // Auto-delete history after 365 days
     });
 
     // ===== IAM ROLES & POLICIES =====
@@ -187,15 +187,17 @@ export class InavoreShuttleStack extends cdk.Stack {
      * - CloudWatch (logs and metrics)
      * - KMS (decrypt encrypted data)
      */
-    this.lambdaExecutionRole = new iam.Role(this, 'LambdaExecutionRole', {
-      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
-      description: 'Execution role for Inavor Shuttle Lambda functions',
+    this.lambdaExecutionRole = new iam.Role(this, "LambdaExecutionRole", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      description: "Execution role for Inavor Shuttle Lambda functions",
       roleName: `${id}-lambda-execution-role`,
     });
 
     // Grant Lambda basic execution (CloudWatch Logs)
     this.lambdaExecutionRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+      iam.ManagedPolicy.fromAwsManagedPolicyName(
+        "service-role/AWSLambdaBasicExecutionRole",
+      ),
     );
 
     // Inline policy for DynamoDB access
@@ -203,13 +205,13 @@ export class InavoreShuttleStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
-          'dynamodb:GetItem',
-          'dynamodb:PutItem',
-          'dynamodb:UpdateItem',
-          'dynamodb:Query',
-          'dynamodb:Scan',
-          'dynamodb:BatchGetItem',
-          'dynamodb:BatchWriteItem',
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
         ],
         resources: [
           this.shopsTable.tableArn,
@@ -217,8 +219,8 @@ export class InavoreShuttleStack extends cdk.Stack {
           `${this.jobsTable.tableArn}/index/*`, // Access to GSIs
           this.importHistoryTable.tableArn,
         ],
-        sid: 'DynamoDBAccess',
-      })
+        sid: "DynamoDBAccess",
+      }),
     );
 
     // Inline policy for S3 access (will be expanded in PHASE-1-INFRA-003)
@@ -226,17 +228,17 @@ export class InavoreShuttleStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
-          's3:GetObject',
-          's3:PutObject',
-          's3:DeleteObject',
-          's3:ListBucket',
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
         ],
         resources: [
-          'arn:aws:s3:::inavor-shuttle-*',
-          'arn:aws:s3:::inavor-shuttle-*/*',
+          "arn:aws:s3:::inavor-shuttle-*",
+          "arn:aws:s3:::inavor-shuttle-*/*",
         ],
-        sid: 'S3Access',
-      })
+        sid: "S3Access",
+      }),
     );
 
     // Inline policy for SQS access (will be expanded in PHASE-1-INFRA-004)
@@ -244,35 +246,32 @@ export class InavoreShuttleStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
-          'sqs:ReceiveMessage',
-          'sqs:DeleteMessage',
-          'sqs:GetQueueAttributes',
-          'sqs:ChangeMessageVisibility',
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:ChangeMessageVisibility",
         ],
-        resources: ['arn:aws:sqs:*:*:inavor-shuttle-*'],
-        sid: 'SQSAccess',
-      })
+        resources: ["arn:aws:sqs:*:*:inavor-shuttle-*"],
+        sid: "SQSAccess",
+      }),
     );
 
     // Inline policy for KMS (for encrypted data)
     this.lambdaExecutionRole.addToPrincipalPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: [
-          'kms:Decrypt',
-          'kms:GenerateDataKey',
-        ],
-        resources: ['arn:aws:kms:*:*:key/*'],
+        actions: ["kms:Decrypt", "kms:GenerateDataKey"],
+        resources: ["arn:aws:kms:*:*:key/*"],
         conditions: {
           StringEquals: {
-            'kms:ViaService': [
-              'dynamodb.*.amazonaws.com',
-              's3.*.amazonaws.com',
+            "kms:ViaService": [
+              "dynamodb.*.amazonaws.com",
+              "s3.*.amazonaws.com",
             ],
           },
         },
-        sid: 'KMSDecryption',
-      })
+        sid: "KMSDecryption",
+      }),
     );
 
     /**
@@ -284,9 +283,9 @@ export class InavoreShuttleStack extends cdk.Stack {
      * - CloudWatch (logs and metrics)
      * - ECR (pull container images)
      */
-    this.appRunnerRole = new iam.Role(this, 'AppRunnerExecutionRole', {
-      assumedBy: new iam.ServicePrincipal('apprunner.amazonaws.com'),
-      description: 'Execution role for Inavor Shuttle App Runner service',
+    this.appRunnerRole = new iam.Role(this, "AppRunnerExecutionRole", {
+      assumedBy: new iam.ServicePrincipal("apprunner.amazonaws.com"),
+      description: "Execution role for Inavor Shuttle App Runner service",
       roleName: `${id}-apprunner-execution-role`,
     });
 
@@ -295,13 +294,13 @@ export class InavoreShuttleStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
-          'dynamodb:GetItem',
-          'dynamodb:PutItem',
-          'dynamodb:UpdateItem',
-          'dynamodb:Query',
-          'dynamodb:Scan',
-          'dynamodb:BatchGetItem',
-          'dynamodb:BatchWriteItem',
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
         ],
         resources: [
           this.shopsTable.tableArn,
@@ -309,8 +308,8 @@ export class InavoreShuttleStack extends cdk.Stack {
           `${this.jobsTable.tableArn}/index/*`, // Access to GSIs
           this.importHistoryTable.tableArn,
         ],
-        sid: 'DynamoDBAccess',
-      })
+        sid: "DynamoDBAccess",
+      }),
     );
 
     // Inline policy for S3 access
@@ -318,84 +317,82 @@ export class InavoreShuttleStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
-          's3:GetObject',
-          's3:PutObject',
-          's3:DeleteObject',
-          's3:ListBucket',
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
         ],
         resources: [
-          'arn:aws:s3:::inavor-shuttle-*',
-          'arn:aws:s3:::inavor-shuttle-*/*',
+          "arn:aws:s3:::inavor-shuttle-*",
+          "arn:aws:s3:::inavor-shuttle-*/*",
         ],
-        sid: 'S3Access',
-      })
+        sid: "S3Access",
+      }),
     );
 
     // Inline policy for Secrets Manager access
     this.appRunnerRole.addToPrincipalPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: [
-          'secretsmanager:GetSecretValue',
-        ],
-        resources: ['arn:aws:secretsmanager:*:*:secret:inavor-shuttle/*'],
-        sid: 'SecretsManagerAccess',
-      })
+        actions: ["secretsmanager:GetSecretValue"],
+        resources: ["arn:aws:secretsmanager:*:*:secret:inavor-shuttle/*"],
+        sid: "SecretsManagerAccess",
+      }),
     );
 
     // CloudWatch Logs access
     this.appRunnerRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLogsFullAccess')
+      iam.ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess"),
     );
 
     // ===== OUTPUTS =====
 
-    new cdk.CfnOutput(this, 'LambdaExecutionRoleArn', {
+    new cdk.CfnOutput(this, "LambdaExecutionRoleArn", {
       value: this.lambdaExecutionRole.roleArn,
-      description: 'ARN of Lambda execution role',
+      description: "ARN of Lambda execution role",
       exportName: `${id}-lambda-execution-role-arn`,
     });
 
-    new cdk.CfnOutput(this, 'AppRunnerExecutionRoleArn', {
+    new cdk.CfnOutput(this, "AppRunnerExecutionRoleArn", {
       value: this.appRunnerRole.roleArn,
-      description: 'ARN of App Runner execution role',
+      description: "ARN of App Runner execution role",
       exportName: `${id}-apprunner-execution-role-arn`,
     });
 
     // DynamoDB table outputs
-    new cdk.CfnOutput(this, 'ShopsTableName', {
+    new cdk.CfnOutput(this, "ShopsTableName", {
       value: this.shopsTable.tableName,
-      description: 'Name of Shops DynamoDB table',
+      description: "Name of Shops DynamoDB table",
       exportName: `${id}-shops-table-name`,
     });
 
-    new cdk.CfnOutput(this, 'ShopsTableArn', {
+    new cdk.CfnOutput(this, "ShopsTableArn", {
       value: this.shopsTable.tableArn,
-      description: 'ARN of Shops DynamoDB table',
+      description: "ARN of Shops DynamoDB table",
       exportName: `${id}-shops-table-arn`,
     });
 
-    new cdk.CfnOutput(this, 'JobsTableName', {
+    new cdk.CfnOutput(this, "JobsTableName", {
       value: this.jobsTable.tableName,
-      description: 'Name of Jobs DynamoDB table',
+      description: "Name of Jobs DynamoDB table",
       exportName: `${id}-jobs-table-name`,
     });
 
-    new cdk.CfnOutput(this, 'JobsTableArn', {
+    new cdk.CfnOutput(this, "JobsTableArn", {
       value: this.jobsTable.tableArn,
-      description: 'ARN of Jobs DynamoDB table',
+      description: "ARN of Jobs DynamoDB table",
       exportName: `${id}-jobs-table-arn`,
     });
 
-    new cdk.CfnOutput(this, 'ImportHistoryTableName', {
+    new cdk.CfnOutput(this, "ImportHistoryTableName", {
       value: this.importHistoryTable.tableName,
-      description: 'Name of Import History DynamoDB table',
+      description: "Name of Import History DynamoDB table",
       exportName: `${id}-import-history-table-name`,
     });
 
-    new cdk.CfnOutput(this, 'ImportHistoryTableArn', {
+    new cdk.CfnOutput(this, "ImportHistoryTableArn", {
       value: this.importHistoryTable.tableArn,
-      description: 'ARN of Import History DynamoDB table',
+      description: "ARN of Import History DynamoDB table",
       exportName: `${id}-import-history-table-arn`,
     });
 

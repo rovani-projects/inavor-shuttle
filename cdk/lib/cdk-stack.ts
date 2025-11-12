@@ -1,8 +1,8 @@
-import * as cdk from 'aws-cdk-lib/core';
-import { Construct } from 'constructs';
+import * as cdk from "aws-cdk-lib/core";
+import { Construct } from "constructs";
 
 /**
- * InavoreShuttleStack - Main CDK Stack for Inavor Shuttle
+ * InavorShuttleStack - Main CDK Stack for Inavor Shuttle
  *
  * This stack serves as the foundation for the Inavor Shuttle application.
  * It will be expanded with DynamoDB, S3, SQS, Lambda, and other AWS services.
@@ -14,19 +14,19 @@ import { Construct } from 'constructs';
  * - Lambda functions for async job processing
  * - IAM roles and policies for service integration
  */
-export class InavoreShuttleStack extends cdk.Stack {
+export class InavorShuttleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // Stack description for CloudFormation
-    new cdk.CfnOutput(this, 'StackDescription', {
-      value: 'Inavor Shuttle - Shopify Product Import Application',
+    new cdk.CfnOutput(this, "StackDescription", {
+      value: "Inavor Shuttle - Shopify Product Import Application",
       exportName: `${id}-description`,
     });
 
     // Output the environment
-    new cdk.CfnOutput(this, 'Environment', {
-      value: this.node.root.node.tryGetContext('environment') || 'dev',
+    new cdk.CfnOutput(this, "Environment", {
+      value: this.node.root.node.tryGetContext("environment") || "dev",
       exportName: `${id}-environment`,
     });
 
