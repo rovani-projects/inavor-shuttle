@@ -513,7 +513,11 @@ See `ISSUES-INDEX.md` for dependency graph and full Phase 1 timeline.
 
 ## Resources
 
-**Documentation**:
+**AWS Setup & Infrastructure**:
+- **AWS Setup Complete Guide**: `/docs/learning/AWS-SETUP-COMPLETE-GUIDE.md` ← Start here for AWS setup (zero to deployed)
+- Account IDs & Configuration: `/.env.aws-accounts` (actual deployed accounts)
+
+**Project Documentation**:
 - Comprehensive Plan: `/docs/comprehensive-implementation-plan.md`
 - Issues Breakdown: `/docs/github-issues-breakdown.md`
 - Phase 1 Summary: `/docs/phase-1-issues-summary.md`
