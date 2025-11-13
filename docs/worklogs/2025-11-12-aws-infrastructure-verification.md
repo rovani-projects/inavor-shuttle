@@ -127,22 +127,34 @@ pointInTimeRecoverySpecification: {
 
 ### Git Commits
 
-1. **Commit 1**: Fix CDK stack deprecation and account ID resolution
+1. **Commit 1**: Fix typo in project name
+   ```
+   commit 3f4d358
+   Rename odd "Inavore" occurences to Inavor - it must have been a typo somewhere during instructions.
+   ```
+
+2. **Commit 2**: Fix CDK stack deprecation and account ID resolution
    ```
    commit bbb3596
    fix: Update CDK stack to use pointInTimeRecoverySpecification and fix account ID resolution
    ```
 
-2. **Commit 2**: Add deployment guide and completion report
+3. **Commit 3**: Add deployment guide and completion report
    ```
    commit efab6af
    docs: Add CDK deployment guide and PHASE-1-INFRA-002 completion report
    ```
 
-3. **Commit 3**: Add AWS setup verification summary
+4. **Commit 4**: Add AWS setup verification summary
    ```
    commit 7074b5c
    docs: Add comprehensive AWS setup verification summary
+   ```
+
+5. **Commit 5**: Update worklog
+   ```
+   commit 62e56ff
+   docs: Update worklog for 2025-11-12
    ```
 
 ---
@@ -293,7 +305,7 @@ aws iam get-role --role-name InavorShuttle-dev-lambda-execution-role
 ### Total Changes
 - **New Documentation**: ~1,150 lines
 - **Code Changes**: ~30 lines
-- **Git Commits**: 3
+- **Git Commits**: 5
 
 ---
 
@@ -357,8 +369,8 @@ aws iam get-role --role-name InavorShuttle-dev-lambda-execution-role
 **Time Spent**: ~2 hours
 **Lines of Code Changed**: ~30
 **Lines of Documentation Created**: ~1,150
-**Issues Resolved**: 2 (PITR deprecation, account ID resolution)
-**Commits**: 3
+**Issues Resolved**: 3 (typo fix, PITR deprecation, account ID resolution)
+**Commits**: 5
 
 **Date Started**: 2025-11-12
 **Date Completed**: 2025-11-12
